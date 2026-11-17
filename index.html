@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Mini Google! An educational 1998 search ranking demonstration comparing keyword frequency search with PageRank authority.">
+  <title>Mini Google! (1998 Search Engine Prototype)</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <!-- 1998 Header & Search Form -->
+    <header class="search-header">
+      <h1 class="logo" aria-label="Mini Google!">
+        <span class="logo-m">M</span><span class="logo-i1">i</span><span class="logo-n">n</span><span class="logo-i2">i</span>
+        <span class="logo-space">&nbsp;</span><span class="logo-g1">G</span><span class="logo-o1">o</span><span class="logo-o2">o</span><span class="logo-g2">g</span><span class="logo-l">l</span><span class="logo-e">e</span><span class="logo-ex">!</span>
+      </h1>
+      <p class="tagline">Search the web using Mini Google! An educational demonstration of search ranking before and after 1998.</p>
+
+      <form id="search-form" class="search-form" onsubmit="return false;">
+        <div class="search-input-wrap">
+          <input type="text" id="query-input" name="q" value="search ranking" autocomplete="off" spellcheck="false" aria-label="Search query">
+        </div>
+        <div id="validation-error" class="validation-error" role="alert" style="display: none;"></div>
+
+        <div class="search-buttons">
+          <button type="submit" id="search-btn">Mini Google Search</button>
+          <button type="button" id="lucky-btn">I'm Feeling Lucky</button>
+        </div>
+
+        <div class="mode-selectors">
+          <label class="radio-label">
+            <input type="radio" name="ranking-mode" value="keyword" id="mode-keyword">
+            Before 1998: keyword search
+          </label>
+          <label class="radio-label">
+            <input type="radio" name="ranking-mode" value="pagerank" id="mode-pagerank" checked>
+            After 1998: PageRank
+          </label>
+        </div>
+      </form>
+
+      <!-- Plain link line -->
+      <nav class="plain-nav" aria-label="Page navigation">
+        <a href="#network-graph">The six pages</a> - 
+        <a href="#random-surfer">Random surfer</a> - 
+        <a href="#comparison-dashboard">Compare both methods</a>
+      </nav>
+    </header>
+
+    <hr class="section-divider">
+
+    <!-- Search Results Section -->
+    <main>
+      <section id="results-section" class="results-section" aria-live="polite">
+        <!-- Search results rendered dynamically here -->
+      </section>
+
+      <hr class="section-divider">
+
+      <!-- Comparison Dashboard -->
+      <section id="comparison-dashboard" class="dashboard-section">
+        <h2>Comparison: Before 1998 vs. After 1998</h2>
+        <p class="section-desc">
+          Side-by-side comparison of search rankings for the current query using pre-1998 keyword frequency versus post-1998 PageRank citation authority.
+        </p>
+
+        <!-- Dynamic explanation text -->
+        <div id="comparison-explanation" class="comparison-explanation"></div>
+
+        <!-- Side-by-side comparison tables -->
+        <div class="compare-columns">
+          <div class="compare-col">
+            <h3 class="table-subtitle">Before 1998: Keyword Frequency Search</h3>
+            <div class="table-responsive">
+              <table id="before-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Page</th>
+                    <th>Title Hits</th>
+                    <th>Text Hits</th>
+                    <th>Score</th>
+                  </tr>
+                </thead>
+                <tbody id="before-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="compare-col">
+            <h3 class="table-subtitle">After 1998: PageRank Combined Search</h3>
+            <div class="table-responsive">
+              <table id="after-table">
+                <thead>
+                  <tr>
+                    <th>Rank</th>
+                    <th>Page</th>
+                    <th>Relevance</th>
+                    <th>PageRank</th>
+                    <th>Final Score</th>
+                    <th>Shift</th>
+                  </tr>
+                </thead>
+                <tbody id="after-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <hr class="section-divider">
+
+      <!-- Six-Page Network Graph -->
+      <section id="network-graph" class="graph-section">
+        <h2>The Six-Page Web Graph</h2>
+        <p class="section-desc">
+          An interactive graph of the six web pages in our prototype database. Node circles are scaled in proportion to their PageRank authority. Curved directed arrows show hyperlinks between pages. Click or press Enter/Space on any node (or click a search result title) to inspect incoming citations, outgoing links, and ranking metrics.
+        </p>
+
+        <div class="graph-container">
+          <svg id="web-graph-svg" class="graph-svg" viewBox="0 0 600 440" role="img" aria-label="Interactive six-page hyperlink network graph">
+            <defs>
+              <!-- Arrowhead markers -->
+              <marker id="arrow-default" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#808080"></path>
+              </marker>
+              <marker id="arrow-outgoing" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#0000cc"></path>
+              </marker>
+              <marker id="arrow-incoming" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#008000"></path>
+              </marker>
+            </defs>
+            <!-- Edges group -->
+            <g id="graph-edges-group"></g>
+            <!-- Nodes group -->
+            <g id="graph-nodes-group"></g>
+          </svg>
+        </div>
+
+        <!-- Node detail inspection box -->
+        <div id="node-detail-box" class="node-detail-box" aria-live="polite">
+          <p class="detail-placeholder">Click any page node in the graph above (or click a search result title) to inspect its hyperlink citations, URL, content, and PageRank.</p>
+        </div>
+      </section>
+
+      <hr class="section-divider">
+
+      <!-- Random Surfer Dice Simulation -->
+      <section id="random-surfer" class="surfer-section">
+        <h2>Random Surfer Dice Simulation</h2>
+        <p class="section-desc">
+          PageRank models a web surfer who navigates by following hyperlinks at random, but occasionally gets bored and jumps (teleports) to an arbitrary page. We simulate this random walk across 20 transitions starting at Page 1 using physical 6-sided dice rules.
+        </p>
+
+        <div class="surfer-rules-box">
+          <strong>Physical 6-Sided Dice Rules:</strong>
+          <ul>
+            <li><strong>Start:</strong> Begin at Page 1 (initial placement is not counted as a visit).</li>
+            <li><strong>Roll a Die Every Step (1-6):</strong>
+              <ul>
+                <li><strong>Roll = 6 (Teleportation Trigger):</strong> The surfer gets bored! Roll the die a second time (1-6) to choose the destination page directly. The first 6 is not a visit to Page 6; only the destination of the second roll is counted.</li>
+                <li><strong>Roll = 1 to 5:</strong>
+                  <ul>
+                    <li>If the page has <strong>2 outgoing links</strong>: Odd roll (1, 3, 5) follows the 1st link; Even roll (2, 4) follows the 2nd link.</li>
+                    <li>If the page has <strong>1 outgoing link</strong>: Follow that single link directly.</li>
+                    <li>If the page has <strong>3+ links</strong>: Follow link index <code>(roll - 1) % links.length</code>.</li>
+                    <li>If the page has <strong>0 links</strong>: Jump to an arbitrary page uniformly at random.</li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
+        <!-- Simulation Controls -->
+        <div class="surfer-controls">
+          <button type="button" id="surfer-start-btn">Start (Auto 700ms)</button>
+          <button type="button" id="surfer-pause-btn" disabled>Pause</button>
+          <button type="button" id="surfer-step-btn">Step Forward</button>
+          <button type="button" id="surfer-reset-btn">Reset</button>
+          <span id="surfer-status" class="surfer-status">Status: Ready (Step 0 of 20)</span>
+        </div>
+
+        <!-- Visit Counters Table -->
+        <h3 class="table-subtitle">Page Visit Counts (Current Simulation)</h3>
+        <div class="table-responsive">
+          <table id="surfer-counters-table">
+            <thead>
+              <tr>
+                <th>Page ID</th>
+                <th>Title</th>
+                <th>Current Status</th>
+                <th>Visits Recorded</th>
+                <th>Observed Share</th>
+                <th>Theoretical PageRank</th>
+              </tr>
+            </thead>
+            <tbody id="surfer-counters-body"></tbody>
+          </table>
+        </div>
+
+        <!-- Step-by-Step Transition Log -->
+        <h3 class="table-subtitle">Step-by-Step Transition Log</h3>
+        <div id="surfer-log-wrap" class="table-responsive log-table-wrap">
+          <table id="surfer-log-table">
+            <thead>
+              <tr>
+                <th>Step #</th>
+                <th>From Page</th>
+                <th>Dice Result</th>
+                <th>Rule Applied</th>
+                <th>Destination Page</th>
+              </tr>
+            </thead>
+            <tbody id="surfer-log-body">
+              <tr>
+                <td colspan="5" class="empty-cell">Simulation not started yet. Click "Start" or "Step Forward".</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Final Ranking Summary (Visible after step 20) -->
+        <div id="surfer-final-wrap" style="display: none;">
+          <h3 class="table-subtitle">Final 20-Step Empirical Ranking vs. Theoretical PageRank</h3>
+          <div class="table-responsive">
+            <table id="surfer-final-table">
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>Page</th>
+                  <th>Visits (out of 20)</th>
+                  <th>Empirical Share</th>
+                  <th>Theoretical PageRank</th>
+                  <th>Analysis</th>
+                </tr>
+              </thead>
+              <tbody id="surfer-final-body"></tbody>
+            </table>
+          </div>
+          <p class="surfer-note">
+            <em>Note on sample size:</em> 20 steps is an illustrative small sample designed for manual inspection and transparent verification, so empirical frequencies will show random variance from the asymptotic PageRank distribution. As the number of steps approaches infinity, the fraction of visits to each page converges mathematically to its exact PageRank score.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <hr class="section-divider">
+
+    <!-- 1998-Style Footer -->
+    <footer class="page-footer">
+      <p>Mini Google! Prototype &copy; 1998 Stanford University / Google Project.</p>
+      <p class="footer-sub">Built with semantic HTML, modular CSS, and vanilla JavaScript. No external dependencies.</p>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
